@@ -27,7 +27,7 @@ obc/sitecustomize.py 运行时兼容层
 
 ## 怎么用
 
-在 [OpenBachelorC](https://github.com/Zucker-jex) 安卓客户端里：
+在 [OpenBachelorC](https://github.com/Zucker-jex/OpenBachelorC-A) 安卓客户端里：
 
 1. 「OBS 服务端」卡片 → **导入兼容层 ZIP**，选本仓库 Releases 里的 zip
 2. **部署兼容层**，写进 `Download/OpenBachelorS`
