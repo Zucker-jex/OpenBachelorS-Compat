@@ -1,4 +1,4 @@
-# OpenBachelorC-Compat
+# OpenBachelorS-Compat
 
 OpenBachelorS 的 **Termux 兼容层** 独立仓库。
 
