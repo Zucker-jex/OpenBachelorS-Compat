@@ -1,0 +1,59 @@
+name: Release compatibility package
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "overlay/**"
+      - "tools/**"
+      - ".github/workflows/release.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build package
+        id: build
+        run: python tools/build_compat.py
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.build.outputs.version }}
+          ARCHIVE: ${{ steps.build.outputs.archive }}
+        run: |
+          set -euo pipefail
+          tag="compat-$VERSION"
+
+          cat > notes.md <<'EOF'
+          OpenBachelorS 的 Termux 兼容层包。
+
+          在 OpenBachelorC 应用里点「导入兼容层 ZIP」，选中本文件即可更新。
+          包内包含 setup.sh / start.sh / start.py / requirements.txt / obc/sitecustomize.py。
+          EOF
+
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" "dist/$ARCHIVE" --clobber
+          else
+            gh release create "$tag" "dist/$ARCHIVE" \
+              --title "兼容层 $VERSION" \
+              --notes-file notes.md
+          fi
+
+          {
+            echo "### 兼容层 \`$VERSION\`"
+            echo
+            echo "- 包：\`$ARCHIVE\`"
+            echo "- 标签：\`$tag\`"
+          } >> "$GITHUB_STEP_SUMMARY"
