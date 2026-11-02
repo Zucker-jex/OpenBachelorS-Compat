@@ -36,6 +36,10 @@ jobs:
           set -euo pipefail
           tag="compat-$VERSION"
 
+          # Stable alias so the Android client can always fetch
+          # releases/latest/download/obs-compat.zip without knowing the version.
+          cp "dist/$ARCHIVE" dist/obs-compat.zip
+
           cat > notes.md <<'EOF'
           OpenBachelorS 的 Termux 兼容层包。
 
@@ -44,9 +48,9 @@ jobs:
           EOF
 
           if gh release view "$tag" >/dev/null 2>&1; then
-            gh release upload "$tag" "dist/$ARCHIVE" --clobber
+            gh release upload "$tag" "dist/$ARCHIVE" dist/obs-compat.zip --clobber
           else
-            gh release create "$tag" "dist/$ARCHIVE" \
+            gh release create "$tag" "dist/$ARCHIVE" dist/obs-compat.zip \
               --title "兼容层 $VERSION" \
               --notes-file notes.md
           fi
@@ -54,6 +58,7 @@ jobs:
           {
             echo "### 兼容层 \`$VERSION\`"
             echo
-            echo "- 包：\`$ARCHIVE\`"
+            echo "- 版本化包：\`$ARCHIVE\`"
+            echo "- 固定别名：\`obs-compat.zip\`（始终指向最新）"
             echo "- 标签：\`$tag\`"
           } >> "$GITHUB_STEP_SUMMARY"
